@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file. See [conven
 - - -
 ## v0.1.0 - 2026-07-26
 #### Bug Fixes
+- fix release pipeline - (3fff006) - Tom Oram
+- add tests and timer - (dd8c578) - Tom Oram
+#### Continuous Integration
+- add github actions - (872f5aa) - Tom Oram
+#### Features
+- add sound - (447fa32) - Tom Oram
+- update colours - (6284c5f) - Tom Oram
+- initial functionality - (a5c708f) - Tom Oram
+#### Miscellaneous Chores
+- **(version)** v0.1.0 - (952a861) - Cog Bot
+
+- - -
+
+## v0.1.0 - 2026-07-26
+#### Bug Fixes
 - add tests and timer - (dd8c578) - Tom Oram
 #### Continuous Integration
 - add github actions - (872f5aa) - Tom Oram
