@@ -174,9 +174,7 @@ jobs:
           check: false
 
       - name: Generate changelog body
-        run: |
-          version="${{ needs.tag.outputs.version }}"
-          cog changelog --at "${version#v}" -t full_hash > CHANGELOG_body.md
+        run: cog changelog --at "${{ needs.tag.outputs.version }}" -t full_hash > CHANGELOG_body.md
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v3
