@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.1.1 - 2026-07-26
+#### Bug Fixes
+- changelog generation - (d84cf1b) - Tom Oram
+
+- - -
+
 ## v0.1.0 - 2026-07-26
 #### Bug Fixes
 - fix release pipeline - (3fff006) - Tom Oram
