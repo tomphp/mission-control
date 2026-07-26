@@ -65,6 +65,13 @@ main {
   padding: 2rem 1.5rem 4rem;
 }
 
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .app-header h1 {
   margin: 0;
   font-size: 1.5rem;
@@ -75,6 +82,31 @@ main {
   margin: 0.25rem 0 1.75rem;
   color: var(--text-muted);
   font-size: 0.9rem;
+}
+
+.sound-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.sound-toggle:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.sound-toggle[data-enabled="true"] {
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 .empty-state {
