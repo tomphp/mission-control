@@ -12,9 +12,9 @@ jobs:
     name: build and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
@@ -36,7 +36,7 @@ jobs:
     outputs:
       version: ${{ steps.cog.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -53,13 +53,25 @@ jobs:
           git-user: 'Cog Bot'
           git-user-email: 'cog-bot@users.noreply.github.com'
 
+      # Makes the outcome visible in the job summary instead of just a
+      # green check - continue-on-error above hides real bump failures
+      # the same way it hides the legitimate "nothing to bump" case.
+      - name: Report bump result
+        if: always()
+        run: |
+          if [ -n "${{ steps.cog.outputs.version }}" ]; then
+            echo "Released \`${{ steps.cog.outputs.version }}\`." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No release: either there were no bumpable commits since the last tag, or the bump step failed - check the \"Bump version and tag\" step log above." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   build-web:
     name: build web assets
     needs: tag
     if: needs.tag.outputs.version != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ needs.tag.outputs.version }}
 
@@ -70,7 +82,7 @@ jobs:
       - name: Build web bundle
         run: cd web && bun install --frozen-lockfile && bun run build
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: web-dist
           path: web/dist
@@ -98,16 +110,16 @@ jobs:
           - goos: windows
             goarch: arm64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ needs.tag.outputs.version }}
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           cache: true
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: web-dist
           path: web/dist
@@ -133,7 +145,7 @@ jobs:
             tar -czf "out/${name}.tar.gz" -C dist mission-control
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: mission-control_${{ matrix.goos }}_${{ matrix.goarch }}
           path: out/*
@@ -145,12 +157,12 @@ jobs:
     if: needs.tag.outputs.version != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           ref: ${{ needs.tag.outputs.version }}
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: mission-control_*
           path: out
@@ -167,7 +179,7 @@ jobs:
           cog changelog --at "${version#v}" -t full_hash > CHANGELOG_body.md
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.tag.outputs.version }}
           body_path: CHANGELOG_body.md
