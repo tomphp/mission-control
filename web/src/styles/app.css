@@ -12,6 +12,13 @@
   --state-waiting-fg: #b45309;
   --state-idle-bg: #eef1f4;
   --state-idle-fg: #5b6470;
+
+  --card-idle-bg: #edf9f1;
+  --card-idle-border: #cbe9d5;
+  --card-working-bg: #eef2ff;
+  --card-working-border: #c9d4fb;
+  --card-waiting-bg: #fdedec;
+  --card-waiting-border: #f4c9c7;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,6 +36,13 @@
     --state-waiting-fg: #ffc069;
     --state-idle-bg: #26272d;
     --state-idle-fg: #a4a7b0;
+
+    --card-idle-bg: #17251d;
+    --card-idle-border: #274634;
+    --card-working-bg: #1a2036;
+    --card-working-border: #2d375f;
+    --card-waiting-bg: #2c1a1a;
+    --card-waiting-border: #542b2b;
   }
 }
 
@@ -83,6 +97,22 @@ main {
   padding: 0.9rem 1.1rem;
   display: grid;
   gap: 0.5rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.session-card--idle {
+  background: var(--card-idle-bg);
+  border-color: var(--card-idle-border);
+}
+
+.session-card--working {
+  background: var(--card-working-bg);
+  border-color: var(--card-working-border);
+}
+
+.session-card--waiting_for_input {
+  background: var(--card-waiting-bg);
+  border-color: var(--card-waiting-border);
 }
 
 .session-card__header {
