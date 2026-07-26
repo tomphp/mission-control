@@ -1,4 +1,5 @@
 import type { Session, SessionState } from "../types/session";
+import { now } from "../state/clock";
 
 const STATE_LABEL: Record<SessionState, string> = {
   working: "Working",
@@ -7,7 +8,7 @@ const STATE_LABEL: Record<SessionState, string> = {
 };
 
 function relativeTime(iso: string): string {
-  const deltaSec = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  const deltaSec = Math.max(0, (now.value - new Date(iso).getTime()) / 1000);
   if (deltaSec < 5) return "just now";
   if (deltaSec < 60) return `${Math.floor(deltaSec)}s ago`;
   if (deltaSec < 3600) return `${Math.floor(deltaSec / 60)}m ago`;
