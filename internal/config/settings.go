@@ -80,7 +80,9 @@ func isMissionControlHook(c HookCommand) bool {
 	if len(fields) != 2 || fields[1] != "report" {
 		return false
 	}
-	return filepath.Base(fields[0]) == "mission-control"
+	base := filepath.Base(fields[0])
+	base = strings.TrimSuffix(base, filepath.Ext(base))
+	return base == "mission-control"
 }
 
 func decodeHooks(s RawSettings) (map[string][]HookEntry, error) {

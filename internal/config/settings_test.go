@@ -202,6 +202,37 @@ func TestInstall_IsIdempotent(t *testing.T) {
 	}
 }
 
+// TestInstall_IsIdempotent_WindowsBinary guards against a regression where
+// isMissionControlHook's basename check didn't strip the ".exe" suffix
+// Windows builds carry (see release.yml, which names the artifact
+// mission-control.exe), so a repeated install would never recognize its own
+// hook and kept appending duplicates. CI only runs this suite on Linux,
+// where path/filepath treats backslash as an ordinary character rather than
+// a separator, so a real "C:\..." path wouldn't exercise filepath.Base the
+// way it does on a Windows build; forward slashes are a separator on both
+// and get the .exe-stripping logic under test either way.
+func TestInstall_IsIdempotent_WindowsBinary(t *testing.T) {
+	s := loadFixture(t)
+	winBinary := "C:/Users/tom/mission-control.exe"
+
+	once, err := config.Install(s, winBinary)
+	if err != nil {
+		t.Fatalf("Install (1st): %v", err)
+	}
+	twice, err := config.Install(once, winBinary)
+	if err != nil {
+		t.Fatalf("Install (2nd): %v", err)
+	}
+
+	for _, event := range []string{"Stop", "Notification", "PreToolUse", "PostToolUse", "SessionStart"} {
+		gotOnce := hookEntries(t, once, event)
+		gotTwice := hookEntries(t, twice, event)
+		if len(gotOnce) != len(gotTwice) {
+			t.Errorf("%s: entries grew from %d to %d on repeated Install with a .exe binary", event, len(gotOnce), len(gotTwice))
+		}
+	}
+}
+
 func TestUninstall_RemovesOnlyMissionControlEntries(t *testing.T) {
 	s := loadFixture(t)
 	installed, err := config.Install(s, binaryPath)
@@ -238,6 +269,36 @@ func TestUninstall_RemovesOnlyMissionControlEntries(t *testing.T) {
 		if string(s[key]) != string(uninstalled[key]) {
 			t.Errorf("key %q changed after uninstall: want %s, got %s", key, s[key], uninstalled[key])
 		}
+	}
+}
+
+// TestUninstall_RemovesEntries_WindowsBinary is the Uninstall counterpart to
+// TestInstall_IsIdempotent_WindowsBinary: the same .exe-suffix bug also made
+// Uninstall unable to recognize its own hooks, so it silently removed
+// nothing.
+func TestUninstall_RemovesEntries_WindowsBinary(t *testing.T) {
+	s := loadFixture(t)
+	winBinary := "C:/Users/tom/mission-control.exe"
+
+	installed, err := config.Install(s, winBinary)
+	if err != nil {
+		t.Fatalf("Install: %v", err)
+	}
+	uninstalled, err := config.Uninstall(installed, winBinary)
+	if err != nil {
+		t.Fatalf("Uninstall: %v", err)
+	}
+
+	for _, event := range []string{"SessionStart", "SessionEnd", "UserPromptSubmit", "PostToolUseFailure", "StopFailure"} {
+		entries := hookEntries(t, uninstalled, event)
+		if len(entries) != 0 {
+			t.Errorf("%s entries after uninstall = %d, want 0", event, len(entries))
+		}
+	}
+
+	stop := hookEntries(t, uninstalled, "Stop")
+	if len(stop) != 1 {
+		t.Fatalf("Stop entries after uninstall = %d, want 1", len(stop))
 	}
 }
 
